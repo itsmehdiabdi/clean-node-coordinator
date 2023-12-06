@@ -1,15 +1,20 @@
-from base.data_gatherer.tla_gatherer_interface import ITlaGatherer
+from base.data_gatherer.data_gatherer import (
+    DataGatherer,
+    TlaInput,
+    TlaOutput,
+)
 from aiohttp import ClientSession
 import json
 
 
-class EthHttpTlaGatherer(ITlaGatherer):
-    def __init__(self, nodeRpc):
+class EthHttpTlaGatherer(DataGatherer[TlaInput, TlaOutput]):
+    def __init__(self, data):
         super().__init__()
-        self.nodeRpc = nodeRpc
+        self.nodeRpc = data["nodeRpc"]
 
     # TODO: error handling
-    async def gather(self, address):
+    async def gather(self, input: TlaInput) -> TlaOutput:
+        address = input["address"]
         async with ClientSession() as session:
             response = await session.post(
                 url=self.nodeRpc,
@@ -25,5 +30,6 @@ class EthHttpTlaGatherer(ITlaGatherer):
                 headers={"Content-Type": "application/json"},
             )
 
-            return int(json.loads(await response.text()).get("result"), 0)
+            tla = int(json.loads(await response.text()).get("result"), 0)
 
+        return {"success": True, "data": tla}

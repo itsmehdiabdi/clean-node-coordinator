@@ -1,2 +1,5 @@
 [] proxy
 [] error handling
+[+] interfaces mustn't have I at the first of their names
+[] add sync implementation sample to code
+[] DataGatherers must have a {success: bool, data: any} return type 

@@ -1,10 +1,10 @@
-from base.data_gatherer.data_gatherer_interface import IDataGatherer
-from base.strategy.strategy_interface import IStrategy
+from base.data_gatherer.data_gatherer import DataGatherer
+from base.strategy.strategy_interface import Strategy
 import asyncio
 
 
-class FirstCompletedStrategy(IStrategy):
-    async def execute(self, dataGatherers: list[IDataGatherer], *args, **kwargs):
+class FirstCompletedStrategy(Strategy):
+    async def execute(self, dataGatherers: list[DataGatherer], *args, **kwargs):
         tasks = [dataGatherer.gather(*args, **kwargs) for dataGatherer in dataGatherers]
         while tasks:
             doneTasks, pendingTasks = await asyncio.wait(
@@ -12,7 +12,7 @@ class FirstCompletedStrategy(IStrategy):
             )
             for doneTask in doneTasks:
                 result = doneTask.result()
-                if result is not None:
+                if result is not None and result["success"]:
                     for pendingTask in pendingTasks:
                         pendingTask.cancel()
                     if len(pendingTasks):

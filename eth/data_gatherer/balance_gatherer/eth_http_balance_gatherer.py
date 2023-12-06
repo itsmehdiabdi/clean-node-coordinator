@@ -1,15 +1,20 @@
-from base.data_gatherer.balance_gatherer_interface import IBalanceGatherer
+from base.data_gatherer.data_gatherer import (
+    DataGatherer,
+    BalanceInput,
+    BalanceOutput,
+)
 from aiohttp import ClientSession
 import json
 
 
-class EthHttpBalanceGatherer(IBalanceGatherer):
-    def __init__(self, nodeRpc):
+class EthHttpBalanceGatherer(DataGatherer[BalanceInput, BalanceOutput]):
+    def __init__(self, data):
         super().__init__()
-        self.nodeRpc = nodeRpc
+        self.nodeRpc = data["nodeRpc"]
 
     # TODO: error handling
-    async def gather(self, address: str, tokens: list[str]) -> dict[str, int]:
+    async def gather(self, input: BalanceInput) -> BalanceOutput:
+        address, tokens = input["address"], input["tokens"]
         balances = []
         async with ClientSession() as session:
             for token in tokens:
@@ -45,4 +50,4 @@ class EthHttpBalanceGatherer(IBalanceGatherer):
 
                 balances.append(int(json.loads(await response.text()).get("result"), 0))
 
-            return balances
+            return {"success": True, "data": balances}

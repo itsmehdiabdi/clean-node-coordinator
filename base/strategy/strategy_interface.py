@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
-from base.data_gatherer.data_gatherer_interface import IDataGatherer
+from base.data_gatherer.data_gatherer import DataGatherer
 
 
-class IStrategy(ABC):
+class Strategy(ABC):
     @abstractmethod
-    async def execute(dataGatherers: list[IDataGatherer], *args, **kwargs):
+    async def execute(dataGatherers: list[DataGatherer], *args, **kwargs):
         pass
